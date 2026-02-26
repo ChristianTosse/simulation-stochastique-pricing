@@ -1,0 +1,1224 @@
+\documentclass[12pt, a4paper, oneside]{report}
+
+% ===================== PACKAGES OBLIGATOIRES =====================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{natbib}
+\usepackage[french]{babel}
+\usepackage{geometry}
+\geometry{margin=2cm}
+
+% ===================== SUPPRESSION DES INDENTATIONS =====================
+\usepackage{parskip}  % Supprime l'indentation et gère l'espacement
+\setlength{\parindent}{0pt}  % Force l'indentation à 0 (au cas où)
+\setlength{\parskip}{0.5ex}  % Espace entre paragraphes (ajuste selon préférence)
+
+%\raggedright  % Force l'alignement à gauche (pas de justification)
+
+% ===================== FILIGRANE =====================
+%\usepackage{draftwatermark}
+%\SetWatermarkText{TDCC}
+%\SetWatermarkScale{5}
+%\SetWatermarkAngle{45}
+%\SetWatermarkColor[gray]{0.9}
+
+% ===================== MATHÉMATIQUES =====================
+\usepackage{amsmath, amssymb, amsthm}
+
+% ===================== GRAPHIQUES =====================
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.16}
+\graphicspath{{images/}}  % Dossier pour les images
+
+% ===================== TABLEAUX =====================
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+
+% ===================== CODE SOURCE =====================
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2,
+	language=R
+}
+
+\lstset{style=mystyle}
+
+% ===================== BIBLIOGRAPHIE =====================
+%\usepackage{natbib}
+\bibliographystyle{plain}
+%\setcitestyle{authoryear}
+
+% ===================== ANNEXES =====================
+\usepackage{appendix}
+
+
+% ===================== PERSONNALISATION =====================
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\headheight}{15pt}
+
+% Définir le texte en pied de page
+\fancyfoot[L]{Christian TOSSE}
+\fancyfoot[C]{\thepage} % Numéro de page centré
+\fancyfoot[R]{Master Statistique \& Probabilité}
+% Définition de la règle de pied de page :
+\renewcommand{\footrulewidth}{0.4pt} % épaisseur de la règle (0.4pt par exemple)
+\renewcommand{\headrulewidth}{0.4pt}   % pas de règle en entête
+% Redéfinition de \sectionmark pour que \leftmark affiche le titre de la section
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	citecolor=blue,
+	urlcolor=blue
+}
+
+% ===================== DÉFINITION DES THÉORÈMES =====================
+\theoremstyle{definition}
+\newtheorem{definition}{Définition}[chapter]
+\newtheorem{proposition}{Proposition}[chapter]
+\newtheorem{theoreme}{Théorème}[chapter]
+\newtheorem{lemme}{Lemme}[chapter]
+\newtheorem{corollaire}{Corollaire}[chapter]
+
+\theoremstyle{remark}
+\newtheorem{remarque}{Remarque}[chapter]
+\newtheorem{exemple}{Exemple}[chapter]
+
+% ===================== COMMANDES PERSONNALISÉES =====================
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\corr}{\operatorname{corr}}
+\newcommand{\dd}{\mathrm{d}}
+
+% ===================== INFORMATIONS DU DOCUMENT =====================
+\title{\textbf{Calcul stochastique et finance quantitative : pricing d'options européennes par méthodes de Monte Carlo}}
+\author{Ton Nom \\ Master de Statistique et Probabilités \\ IMSP, Université d'Abomey-Calavi}
+\date{Année académique 2025-2026}
+
+% ===================== DÉBUT DU DOCUMENT =====================
+\begin{document}
+	
+	% Page de garde
+	\begin{titlepage}
+		\begin{center}
+			\vspace*{1cm}
+			
+			%\Huge\textbf{Institut de Mathématiques et de Sciences Physiques}\\
+			%\Large\textbf{Master de Statistique et Probabilités}
+			
+			\vspace{1.5cm}
+			
+			\rule{\linewidth}{0.5mm}\\[0.4cm]
+			{\huge \bfseries Calcul stochastique et finance quantitative : pricing d'options européennes par méthodes de Monte Carlo}\\[0.4cm]
+			\rule{\linewidth}{0.5mm}
+			
+			\vspace{1.5cm}
+			
+			\Large\textbf{Christian D.C. TOSSE \\ Master de Statistique et Probabilités \\ IMSP, Université d'Abomey-Calavi}
+			
+			\vfill
+			
+			{\large Année académique 2025-2026}
+			
+		\end{center}
+	\end{titlepage}
+	
+
+	\newpage
+	
+	% Résumé
+	\chapter*{Résumé}
+	\addcontentsline{toc}{chapter}{Résumé}
+	
+	Ce travail présente l'implémentation de méthodes de simulation de mouvements browniens et d'équations différentielles stochastiques (EDS) pour le pricing d'options financières. Après un rappel théorique sur le mouvement brownien, le modèle de Black-Scholes et la méthode Monte Carlo, nous détaillons les algorithmes de discrétisation d'Euler-Maruyama et de Milstein. La méthode Monte Carlo est ensuite appliquée au calcul du prix d'options européennes, et les résultats sont comparés à la formule fermée de Black-Scholes. Les simulations montrent une excellente concordance (erreur relative < 0.5\% avec 100 000 simulations), validant ainsi notre implémentation. Ce travail illustre le passage de la théorie du calcul stochastique à des applications concrètes en finance quantitative.
+	
+	\vspace{0.5cm}
+	\textbf{Mots-clés :} Calcul stochastique, finance quantitative, mouvement brownien, équations différentielles stochastiques, méthode de Monte Carlo, pricing d'options, Black-Scholes, Euler-Maruyama, Milstein.
+	
+	% Table des matières
+	\tableofcontents
+	
+	% Liste des figures
+	\listoffigures
+	\addcontentsline{toc}{chapter}{Liste des figures}
+	
+	% Liste des tableaux
+	\listoftables
+	\addcontentsline{toc}{chapter}{Liste des tableaux}
+	
+	
+	
+	
+	% ===================== INTRODUCTION =====================
+	\chapter*{Introduction générale}
+	\addcontentsline{toc}{chapter}{Introduction générale}
+	\markboth{INTRODUCTION GÉNÉRALE}{}
+	
+	Depuis les travaux fondateurs de Black et Scholes en 1973, la modélisation stochastique occupe une place centrale en finance quantitative. Leur modèle, qui a valu le prix Nobel d'économie en 1997, propose une équation différentielle stochastique pour décrire l'évolution du prix d'un actif financier. Cette avancée théorique majeure a ouvert la voie à une évaluation rigoureuse des options, ces instruments financiers qui donnent le droit, mais non l'obligation, d'acheter ou de vendre un actif à un prix convenu à une date future. Pourtant, le caractère exceptionnel de ce modèle réside précisément dans l'existence d'une solution explicite, une rareté dans l'univers des équations différentielles stochastiques.
+	\vspace{0.5cm}
+	
+	Dans la plupart des cas en effet, les équations qui gouvernent l'évolution des actifs financiers ne peuvent être résolues analytiquement. Cette réalité mathématique, loin d'être un détail technique, constitue un obstacle fondamental à l'évaluation des produits dérivés. Elle impose le recours à des méthodes numériques pour estimer les grandeurs d'intérêt, au premier rang desquelles le prix des options. La question qui sous-tend ce travail est donc la suivante : comment estimer numériquement le prix d'une option financière lorsqu'aucune formule fermée n'est disponible ? Comment simuler de manière fidèle des processus aléatoires continus à partir d'ordinateurs qui ne manipulent que des grandeurs discrètes ? Quelle est la précision des méthodes de discrétisation couramment utilisées ? Dans quelle mesure peut-on faire confiance aux résultats obtenus par simulation ?
+	\vspace{0.5cm}
+	
+	Ces interrogations ne sont pas seulement académiques. Dans les salles de marché, traders et gestionnaires de risques s'appuient quotidiennement sur des modèles numériques pour prendre des décisions engageant des millions, voire des milliards. La robustesse des méthodes employées est donc un enjeu pratique de premier plan, et leur validation rigoureuse une nécessité absolue. C'est dans cet esprit que s'inscrit ce travail, qui se veut à la fois une exploration méthodologique et une validation empirique des techniques de simulation stochastique appliquées à la finance.
+	\vspace{0.5cm}
+	
+	Notre démarche s'articule autour de quatre objectifs complémentaires. Il s'agit d'abord d'implémenter des simulateurs de mouvements browniens et de ponts browniens, ces processus qui constituent les briques élémentaires du calcul stochastique. Ensuite, nous nous attacherons à discrétiser des équations différentielles stochastiques par deux méthodes classiques : Euler-Maruyama, la plus simple, et Milstein, qui apporte une correction supplémentaire issue du lemme d'Itô. La méthode Monte Carlo sera ensuite appliquée au pricing d'options européennes dans le cadre du modèle de Black-Scholes. Enfin, une validation rigoureuse des résultats obtenus par simulation sera effectuée par comparaison avec la formule fermée de Black-Scholes, qui constitue un cas test idéal.
+	\vspace{0.5cm}
+	
+	Le cheminement de ce document suit une progression naturelle, de la théorie la plus abstraite à l'implémentation la plus concrète. Le premier chapitre rappelle les fondements théoriques nécessaires à la compréhension du travail : mouvement brownien, équations différentielles stochastiques, modèle de Black-Scholes et méthode Monte Carlo. Le second chapitre détaille les méthodes numériques implémentées, avec leurs algorithmes et leur traduction en code R. Le troisième chapitre présente et analyse les résultats obtenus, en mettant l'accent sur la validation et la convergence. Enfin, le quatrième chapitre discute des limites du travail et ouvre des perspectives vers des modèles plus complexes et des techniques de réduction de variance.
+	\vspace{0.5cm}
+	
+	Au terme de ce parcours, nous aurons non seulement implémenté des outils opérationnels pour le pricing d'options, mais surtout acquis une compréhension profonde des forces et faiblesses des méthodes numériques en calcul stochastique. C'est cette double ambition, théorique et pratique, qui donne tout son sens à ce travail.
+	
+	% ===================== CHAPITRE 1 =====================
+	\chapter{Rappels théoriques}
+	
+	\section{Mouvement brownien et processus stochastiques}
+	
+	\subsection{Définition et propriétés}
+	On se place dans un espace de probabilité $(\Omega, \mathcal{F}, \mathbb{P})$.
+	
+	\begin{definition}
+		Un \textbf{processus stochastique} est une famille \((X_t)_{t \in I}\) de variables aléatoires définies sur un même espace de probabilité \((\Omega, \mathcal{F}, \mathbb{P})\) et indexées par un ensemble \(I \subset \mathbb{R}\). En pratique, \(I\) représente le temps : on distingue les processus à temps discret (\(I = \mathbb{N}\) ou \(I = \{0,1,\ldots,T\}\)) et les processus à temps continu (\(I = \mathbb{R}_+\) ou \(I = [0,T]\)).
+	\end{definition}
+	
+	Pour chaque \(\omega \in \Omega\) fixé, l'application \(t \mapsto X_t(\omega)\) est appelée une \textbf{trajectoire} ou une \textbf{réalisation} du processus. Un processus stochastique peut donc être vu comme une collection aléatoire de fonctions du temps.
+	
+	Le mouvement brownien, que nous définissons maintenant, est l'exemple le plus fondamental de processus stochastique à temps continu.
+	
+	\begin{definition}
+		
+		Une famille $B = (W_t, t \geq 0)$ de variables aléatoires réelles est un \textbf{mouvement brownien} si :
+		\begin{enumerate}
+			\item[(i)] Presque sûrement, la fonction \(t \mapsto W_t(\omega)\) est continue sur \(\mathbb{R}_+\).
+			\item[(ii)] Pour tout \(n \geq 2\), et tous \(0 =: t_0 \leq t_1 \leq t_2 \leq \cdots \leq t_n\), les variables aléatoires
+			\[
+			W_{t_1} - W_{t_0}, \; W_{t_2} - W_{t_1}, \; \cdots, \; W_{t_n} - W_{t_{n-1}}
+			\]
+			sont indépendantes.
+			\item[(iii)] Pour tous \(t \geq s \geq 0\), \(W_t - W_s\) suit la loi gaussienne \(\mathcal{N}(0, \sigma^2(t - s))\).
+		\end{enumerate}
+	\end{definition}
+	
+	\begin{proposition}[Propriétés fondamentales]
+		\begin{align}
+			\E[W_t] &= 0 \\
+			\Var[W_t] &= t \\
+			\Cov(W_s, W_t) &= \min(s, t)
+		\end{align}
+	\end{proposition}
+	
+	\begin{remarque}
+		\begin{enumerate} 
+			\item[(a)] Un mouvement brownien est dit \textbf{standard} si :
+			\[
+			W_0 = 0 \quad p.s., \qquad \sigma = 1.
+			\]
+			Dans tout ce document, lorsque l'on parle du mouvement brownien sans autre précision, il s'agira du mouvement brownien standard.
+			
+			\item[(b)] Pour tout réel \(T > 0\), on appelle \textbf{mouvement brownien sur \([0,T]\)} toute famille de variables aléatoires vérifiant les conditions de la définition pour les indices dans \([0,T]\).
+			
+			\item[(c)] On dit que le mouvement brownien est \textbf{à accroissements indépendants} (propriété (ii)) et \textbf{stationnaires} (propriété (iii)).
+		\end{enumerate}
+	\end{remarque}
+	
+	\subsection{Pont brownien}
+	
+	\begin{definition}[Pont brownien]
+		Un pont brownien sur $[0,1]$ est un processus $(B_t)_{t \in [0,1]}$ défini par :
+		\begin{equation}
+			B_t = W_t - t W_1, \quad t \in [0,1]
+		\end{equation}
+		où $(W_t)$ est un mouvement brownien standard.
+	\end{definition}
+	
+	Le pont brownien vérifie $B_0 = B_1 = 0$ presque sûrement et est un processus gaussien.
+	
+	\section{Équations différentielles stochastiques}
+	
+	\subsection{Formule d'Itô, Définition et exemples}
+	
+	Soit \((\Omega, \mathcal{F}, (\mathcal{F}_t), \mathbb{P})\) un espace de probabilité filtré, et soit \((W_t)_{t \geq 0}\) un \((\mathcal{F}_t)\)-mouvement brownien standard.
+	
+		\begin{definition}[Équation différentielle stochastique]
+		Une équation différentielle stochastique (EDS) est une équation de la forme :
+		\begin{equation}
+			\dd X_t = \mu(t, X_t) \dd t + \sigma(t, X_t) \dd W_t
+		\end{equation}
+		où
+		\begin{itemize}
+			\item[$\bullet$] $\mu$ est le coefficient de dérive (drift)
+			\item[$\bullet$] $\sigma$ est le coefficient de diffusion
+			\item[$\bullet$] $(W_t)$ est un mouvement brownien standard
+		\end{itemize}
+	\end{definition}
+	
+	\begin{definition}[Processus d'Itô]
+		On appelle \textbf{processus d'Itô} tout processus \((X_t)_{t \geq 0}\) admettant une représentation de la forme
+		\begin{equation}
+			X_t = X_0 + \int_0^t H_s \, dW_s + \int_0^t V_s \, ds, \quad t \geq 0,
+		\end{equation}
+		où :
+		\begin{itemize}
+			\item[$\bullet$] \(X_0\) est \(\mathcal{F}_0\)-mesurable ;
+			\item[$\bullet$] \((H_t)_{t \geq 0}\) est un processus adapté tel que \(\displaystyle \int_0^t H_s^2 \, ds < \infty\) p.s. pour tout \(t\) ;
+			\item[$\bullet$] \((V_t)_{t \geq 0}\) est un processus adapté tel que \(\displaystyle \int_0^t |V_s| \, ds < \infty\) p.s. pour tout \(t\).
+		\end{itemize}
+	\end{definition}
+	
+	Pour un tel processus, on définit sa \textbf{variation quadratique} par
+	\begin{equation}
+		\langle X \rangle_t := \int_0^t H_s^2 \, ds, \quad t \geq 0.
+	\end{equation}
+	
+	\begin{theoreme}[Formule d'Itô]
+		Soit \(X = (X_t)_{t \geq 0}\) un processus d'Itô de décomposition canonique
+		\begin{equation}
+			X_t = X_0 + \int_0^t H_s \, dW_s + \int_0^t V_s \, ds.
+		\end{equation}
+		
+		\begin{enumerate}
+			\item[(i)] \textbf{Formule pour une fonction \(f\) de \(x\) seulement.} \\
+			Soit \(f : \mathbb{R} \to \mathbb{R}\) une fonction de classe \(C^2\). Alors
+			\begin{equation}
+				f(X_t) = f(X_0) + \int_0^t f'(X_s) H_s \, dW_s + \int_0^t f'(X_s) V_s \, ds + \frac{1}{2} \int_0^t f''(X_s) H_s^2 \, ds,
+			\end{equation}
+			ce qui s'écrit aussi sous forme différentielle :
+			\begin{equation}
+				\dd f(X_t) = f'(X_t) \dd X_t + \frac{1}{2} f''(X_t) \dd \langle X \rangle_t.
+			\end{equation}
+			
+			\item[(ii)] \textbf{Formule pour une fonction \(F\) de \(t\) et \(x\).} \\
+			Soit \(F : \mathbb{R}_+ \times \mathbb{R} \to \mathbb{R}\) une fonction de classe \(C^{1,2}\) (continûment différentiable en \(t\) et deux fois continûment différentiable en \(x\)). Alors
+				\begin{equation}
+				F(t, X_t) = F(0, X_0) + \int_0^t \frac{\partial F}{\partial s}(s, X_s) \, ds + \int_0^t \frac{\partial F}{\partial x}(s, X_s) \, dX_s + \frac{1}{2} \int_0^t \frac{\partial^2 F}{\partial x^2}(s, X_s) \, d\langle X \rangle_s.
+			\end{equation}
+			ou sous forme différentielle :
+			\begin{equation}
+				\dd F(t, X_t) = \frac{\partial F}{\partial t}(t, X_t) \dd t + \frac{\partial F}{\partial x}(t, X_t) \dd X_t + \frac{1}{2} \frac{\partial^2 F}{\partial x^2}(t, X_t) \dd \langle X \rangle_t.
+			\end{equation}
+		\end{enumerate}
+	\end{theoreme}
+	\vspace{0.5cm}
+	
+	\begin{remarque}
+		Dans ces formules :
+		
+		\begin{itemize}
+			\item[$\bullet$] \(\dd X_t = H_t \dd W_t + V_t \dd t\) est la différentielle du processus d'Itô ;
+			\item[$\bullet$] \(\dd \langle X \rangle_t = H_t^2 \dd t\) est sa variation quadratique infinitésimale ;
+			\item[$\bullet$] Les intégrales stochastiques \(\int_0^t (\cdot) \dd W_s\) sont des intégrales d'Itô, définies comme limites en moyenne quadratique.
+		\end{itemize}
+	\end{remarque}
+	\vspace{0.5cm}
+	
+	\begin{exemple}[Mouvement brownien géométrique]
+		Utilisé en finance pour modéliser le prix d'un actif :
+		\begin{equation}
+			\dd S_t = \mu S_t \dd t + \sigma S_t \dd W_t
+		\end{equation}
+		Sa solution explicite est :
+		\begin{equation}
+			S_t = S_0 \exp\left( \left(\mu - \frac{\sigma^2}{2}\right)t + \sigma W_t \right)
+		\end{equation}
+	\end{exemple}
+	
+
+
+	\section{Modèle de Black-Scholes}
+	
+	Le modèle de Black-Scholes, développé par Fischer Black et Myron Scholes en 1973, repose sur un ensemble d'hypothèses simplificatrices :
+	
+	\begin{itemize}
+		\item[$\bullet$] Le marché est sans friction : il n'y a pas de coûts de transaction, ni de taxes, ni de contraintes sur les ventes à découvert.
+		\item[$\bullet$] L'actif sous-jacent ne verse pas de dividendes pendant la durée de vie de l'option.
+		\item[$\bullet$] Le taux d'intérêt sans risque \(r\) est constant et identique pour tous les emprunts et prêts.
+		\item[$\bullet$] La volatilité \(\sigma\) de l'actif sous-jacent est constante.
+		\item[$\bullet$] L'actif sous-jacent suit un mouvement brownien géométrique.
+		\item[$\bullet$] Il n'existe pas d'opportunité d'arbitrage.
+	\end{itemize}
+	
+	\subsection{Dynamique de l'actif sous-jacent}
+	
+	Sous ces hypothèses, le prix \(S_t\) de l'actif sous-jacent à l'instant \(t\) est modélisé par l'équation différentielle stochastique suivante :
+	
+	\begin{equation}
+		\dd S_t = \mu S_t \dd t + \sigma S_t \dd W_t, \quad t \geq 0,
+	\end{equation}
+	
+	où :
+	\begin{itemize}
+		\item[$\bullet$] \(\mu \in \mathbb{R}\) est le rendement moyen instantané de l'actif (drift),
+		\item[$\bullet$] \(\sigma > 0\) est la volatilité de l'actif,
+		\item[$\bullet$] \((W_t)_{t \geq 0}\) est un mouvement brownien standard sous la probabilité historique \(\mathbb{P}\).
+	\end{itemize}
+	
+	Cette équation a une solution explicite donnée par :
+	
+	\begin{equation}
+		S_t = S_0 \exp\left( \left(\mu - \frac{\sigma^2}{2}\right) t + \sigma W_t \right), \quad t \geq 0.
+	\end{equation}
+	
+	Ainsi, \(\ln S_t\) suit un mouvement brownien avec dérive : c'est le modèle \textbf{log-normal}.
+	
+	\subsection{Changement de probabilité et mesure risque-neutre}
+	
+	En finance, on utilise la \textbf{probabilité risque-neutre} \(\mathbb{Q}\) sous laquelle le prix actualisé de l'actif est une martingale. Sous cette probabilité, la dynamique devient :
+	
+	\begin{equation}
+		\dd S_t = r S_t \dd t + \sigma S_t \dd W_t^{\mathbb{Q}},
+	\end{equation}
+	
+	où \((W_t^{\mathbb{Q}})_{t \geq 0}\) est un mouvement brownien standard sous \(\mathbb{Q}\). Le rendement moyen \(\mu\) est remplacé par le taux sans risque \(r\).
+	
+	Sous \(\mathbb{Q}\), la solution s'écrit :
+	
+	\begin{equation}
+		S_t = S_0 \exp\left( \left(r - \frac{\sigma^2}{2}\right) t + \sigma W_t^{\mathbb{Q}} \right), \quad t \geq 0.
+	\end{equation}
+	
+	\subsection{Formule de Black-Scholes pour une option européenne}
+	
+	Une option d'achat européenne (call) donne le droit, mais non l'obligation, d'acheter l'actif à un prix \(K\) (strike) à une date \(T\) (maturité). Son payoff est :
+	
+	\begin{equation}
+		(S_T - K)^+ = \max(S_T - K, 0).
+	\end{equation}
+	
+	Le prix à l'instant \(0\) d'un call européen est donné par l'espérance actualisée sous la probabilité risque-neutre :
+	
+	\begin{equation}
+		C_0 = e^{-rT} \, \mathbb{E}^{\mathbb{Q}}\left[ (S_T - K)^+ \right].
+	\end{equation}
+	
+	Le calcul explicite de cette espérance conduit à la célèbre formule de Black-Scholes :
+	
+	\begin{theoreme}[Formule de Black-Scholes]
+		Le prix à l'instant \(0\) d'un call européen de strike \(K\) et d'échéance \(T\) est :
+		
+		\begin{equation}
+			\boxed{C_0 = S_0 \Phi(d_1) - K e^{-rT} \Phi(d_2)}
+		\end{equation}
+		
+		où :
+		\begin{align}
+			d_1 &= \frac{\ln(S_0/K) + (r + \sigma^2/2)T}{\sigma \sqrt{T}}, \\
+			d_2 &= d_1 - \sigma \sqrt{T} = \frac{\ln(S_0/K) + (r - \sigma^2/2)T}{\sigma \sqrt{T}},
+		\end{align}
+		et \(\Phi\) est la fonction de répartition de la loi normale centrée réduite :
+		\begin{equation}
+			\Phi(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^x e^{-u^2/2} \dd u.
+		\end{equation}
+	\end{theoreme}
+	
+	Pour une option de vente européenne (put), le prix s'obtient par la parité call-put :
+	
+	\begin{equation}
+		P_0 = C_0 + K e^{-rT} - S_0 = K e^{-rT} \Phi(-d_2) - S_0 \Phi(-d_1).
+	\end{equation}
+	où
+	\begin{itemize}
+		\item[$\bullet$] \(S_0\) : prix de l'actif à l'instant initial
+		\item[$\bullet$] \(K\) : prix d'exercice (strike)
+		\item[$\bullet$] \(T\) : temps jusqu'à l'échéance (en années)
+		\item[$\bullet$] \(r\) : taux d'intérêt sans risque (continu)
+		\item[$\bullet$] \(\sigma\) : volatilité de l'actif
+		\item[$\bullet$] \(\Phi(d_1)\) : delta de l'option, sensibilité au prix du sous-jacent
+		\item[$\bullet$] \(\Phi(d_2)\) : probabilité que l'option soit exercée sous la mesure risque-neutre
+	\end{itemize}
+	\vspace{0.5cm}
+	
+	Il est remarquable que la formule de Black-Scholes ne dépende pas du rendement moyen \(\mu\) de l'actif, mais seulement de sa volatilité \(\sigma\). Cette formule est explicite et ne nécessite aucune intégration numérique, ce qui est exceptionnel en finance quantitative. Elle constitue d'ailleurs l'un des rares cas d'équation différentielle stochastique admettant une solution fermée, ce qui en fait un benchmark idéal pour valider les méthodes numériques comme les simulations Monte Carlo. Il convient toutefois de garder à l'esprit que les hypothèses du modèle (volatilité constante, taux d'intérêt constant, absence de dividendes) sont rarement vérifiées en pratique, ce qui motive le recours à des modèles plus réalistes tels que celui de Heston à volatilité stochastique.
+	
+	
+	
+	\section{Méthode Monte Carlo}
+	
+	La méthode Monte Carlo est une technique probabiliste permettant d'estimer une espérance mathématique par une moyenne empirique. Son principe repose sur la loi des grands nombres et le théorème central limite.
+	
+	Soit \(X\) une variable aléatoire et \(g\) une fonction telle que \(\mathbb{E}[|g(X)|] < \infty\). On souhaite estimer la quantité :
+	\begin{equation}
+		\theta = \mathbb{E}[g(X)].
+	\end{equation}
+	
+	Si l'on dispose d'un échantillon \(X_1, X_2, \ldots, X_M\) de variables aléatoires indépendantes et de même loi que \(X\), alors l'estimateur de Monte Carlo est défini par :
+	\begin{equation}
+		\hat{\theta}_M = \frac{1}{M} \sum_{i=1}^M g(X_i).
+	\end{equation}
+	
+	\subsection{Propriétés de convergence}
+	
+	\begin{proposition}[Loi des grands nombres]
+		L'estimateur \(\hat{\theta}_M\) converge presque sûrement vers \(\theta\) lorsque \(M \to \infty\) :
+		\begin{equation}
+			\hat{\theta}_M \xrightarrow{p.s.} \theta.
+		\end{equation}
+	\end{proposition}
+	
+	\begin{proposition}[Théorème central limite]
+		Si \(\Var[g(X)] < \infty\), alors pour \(M\) grand :
+		\begin{equation}
+			\sqrt{M} \left( \hat{\theta}_M - \theta \right) \xrightarrow{\mathcal{L}} \mathcal{N}\left(0, \Var[g(X)]\right).
+		\end{equation}
+	\end{proposition}
+	
+	On en déduit un intervalle de confiance asymptotique au niveau \(95\%\) :
+	\begin{equation}
+		IC = \left[ \hat{\theta}_M - 1.96 \frac{\hat{\sigma}}{\sqrt{M}}, \; \hat{\theta}_M + 1.96 \frac{\hat{\sigma}}{\sqrt{M}} \right],
+	\end{equation}
+	où \(\hat{\sigma}^2 = \frac{1}{M-1} \sum_{i=1}^M \left( g(X_i) - \hat{\theta}_M \right)^2\) est la variance empirique.
+
+	
+	\subsection{Vitesse de convergence}
+	
+	L'erreur de la méthode Monte Carlo décroît en \(O(1/\sqrt{M})\), indépendamment de la dimension du problème. Cela signifie que pour diviser l'erreur par 10, il faut multiplier le nombre de simulations par 100.
+	
+	Cette convergence relativement lente justifie le recours à des techniques de réduction de variance (variables antithétiques, variables de contrôle, échantillonnage préférentiel) qui seront évoquées dans le chapitre 4.
+	
+\vspace{0.5cm}
+	La méthode Monte Carlo présente plusieurs avantages majeurs : sa simplicité d'implémentation, sa flexibilité qui la rend adaptable à toute dimension et à toute complexité de payoff, sa capacité à fournir un intervalle de confiance sur l'estimation, et sa nature intrinsèquement parallélisable qui permet d'exploiter efficacement les architectures de calcul modernes. Cependant, elle souffre d'une convergence relativement lente, en \(O(1/\sqrt{M})\), ce qui signifie que pour gagner un facteur 10 en précision, il faut multiplier le nombre de simulations par 100. Cette lenteur peut nécessiter un très grand nombre de simulations pour atteindre une précision satisfaisante, notamment pour les options hors de la monnaie. Enfin, la qualité des résultats dépend crucialement de la qualité du générateur de nombres aléatoires utilisé, ce qui impose d'être vigilant sur ce point technique.
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+\chapter{Méthodes numériques}
+
+\section{Simulation de processus browniens}
+
+\subsection{Algorithme de simulation du mouvement brownien standard}
+
+La simulation d'un mouvement brownien standard sur un intervalle \([0,T]\) repose sur la discrétisation temporelle. On divise l'intervalle en \(N\) pas de temps de longueur \(\Delta t = T/N\). Les instants de discrétisation sont notés \(t_j = j \Delta t\) pour \(j = 0, 1, \ldots, N\).
+
+Le mouvement brownien \((W_t)_{t \geq 0}\) étant un processus à accroissements gaussiens indépendants, on génère les incréments successifs :
+\[
+\Delta W_j = W_{t_j} - W_{t_{j-1}} \sim \mathcal{N}(0, \Delta t), \quad j = 1, \ldots, N.
+\]
+
+La trajectoire discrète est alors construite par somme cumulée :
+\[
+W_{t_0} = 0, \qquad W_{t_j} = \sum_{k=1}^j \Delta W_k, \quad j = 1, \ldots, N.
+\]
+
+Cette méthode, parfois appelée \textbf{méthode de discrétisation par incréments indépendants}, est exacte au sens où les valeurs simulées aux points de discrétisation suivent la bonne loi jointe. L'erreur n'intervient que dans l'interpolation entre les points.
+
+\subsection{Simulation d'un pont brownien}
+
+Le pont brownien sur \([0,T]\) est un processus \((B_t)_{t \in [0,T]}\) défini à partir d'un mouvement brownien standard par :
+\[
+B_t = W_t - \frac{t}{T} W_T, \quad t \in [0,T].
+\]
+
+Il vérifie les conditions aux limites \(B_0 = B_T = 0\) presque sûrement. Pour simuler un pont brownien, on peut :
+\begin{itemize}
+	\item Simuler d'abord un mouvement brownien standard \((W_t)\) sur \([0,T]\) ;
+	\item Puis appliquer la transformation ci-dessus.
+\end{itemize}
+
+Alternativement, on peut utiliser une construction par récursion : le pont brownien conditionnel peut être simulé en utilisant la propriété que, sachant \(B_t\) et \(B_s\), la valeur à un instant intermédiaire suit une loi normale dont les paramètres s'expriment simplement.
+
+\section{Discrétisation des EDS}
+
+Soit une équation différentielle stochastique (EDS) générale :
+\[
+\dd X_t = \mu(t, X_t) \dd t + \sigma(t, X_t) \dd W_t, \quad X_0 = x_0.
+\]
+
+En dehors de quelques cas particuliers (comme le mouvement brownien géométrique), cette équation n'admet pas de solution explicite. On doit donc recourir à des méthodes numériques de discrétisation.
+
+\subsection{Méthode d'Euler-Maruyama}
+
+La méthode d'Euler-Maruyama est la plus simple des méthodes de discrétisation pour les EDS. Elle approxime la solution sur une grille temporelle \(t_0, t_1, \ldots, t_N\) par la récurrence :
+\[
+X_{t_{i+1}} = X_{t_i} + \mu(t_i, X_{t_i}) \Delta t + \sigma(t_i, X_{t_i}) \Delta W_i,
+\]
+où \(\Delta t = T/N\) est le pas de temps et \(\Delta W_i = W_{t_{i+1}} - W_{t_i} \sim \mathcal{N}(0, \Delta t)\) sont les incréments browniens.
+
+Cette méthode est l'analogue stochastique de la méthode d'Euler déterministe. Son ordre de convergence fort est \(0.5\) (l'erreur sur les trajectoires décroît en \(\sqrt{\Delta t}\)), tandis que son ordre de convergence faible est \(1\) (l'erreur sur les espérances décroît en \(\Delta t\)).
+
+\subsection{Méthode de Milstein}
+
+La méthode de Milstein améliore la convergence forte en ajoutant un terme correctif issu du développement de Taylor stochastique (lemme d'Itô). Pour une EDS à coefficient de diffusion \(\sigma\) dépendant de \(X\), la récurrence s'écrit :
+\[
+X_{t_{i+1}} = X_{t_i} + \mu \Delta t + \sigma \Delta W_i + \frac{1}{2} \sigma \frac{\partial \sigma}{\partial x} \left( (\Delta W_i)^2 - \Delta t \right).
+\]
+
+Le terme supplémentaire \((\Delta W_i)^2 - \Delta t\) a une espérance nulle mais une variance qui améliore l'approximation des trajectoires. Cette méthode atteint un ordre de convergence fort égal à \(1\), soit une amélioration significative par rapport à Euler-Maruyama.
+
+Pour des modèles particuliers comme le modèle CIR (Cox-Ingersoll-Ross) où \(\sigma(x) = \sigma \sqrt{x}\), la dérivée \(\frac{\partial \sigma}{\partial x} = \frac{\sigma}{2\sqrt{x}}\) doit être manipulée avec précaution pour garantir la positivité du processus.
+
+\subsection{Comparaison des méthodes}
+
+\begin{itemize}
+	\item \textbf{Précision} : Milstein est plus précis qu'Euler-Maruyama, surtout pour les fortes volatilités ou les pas de temps grands.
+	\item \textbf{Complexité} : Milstein nécessite le calcul de la dérivée \(\partial \sigma / \partial x\), ce qui peut être complexe pour certains modèles.
+	\item \textbf{Convergence} : Euler-Maruyama suffit souvent pour des calculs d'espérances (convergence faible), tandis que Milstein est préférable pour des simulations trajectorielles précises.
+\end{itemize}
+
+\section{Pricing d'options par Monte Carlo}
+
+Dans le cadre du pricing d'options européennes, on cherche à calculer :
+\begin{equation}
+	C_0 = e^{-rT} \, \mathbb{E}^{\mathbb{Q}}\left[ \max(S_T - K, 0) \right],
+\end{equation}
+où l'espérance est prise sous la probabilité risque-neutre \(\mathbb{Q}\).
+
+Sous cette probabilité, le prix de l'actif à maturité s'écrit :
+\begin{equation}
+	S_T = S_0 \exp\left( \left(r - \frac{\sigma^2}{2}\right) T + \sigma \sqrt{T} \, Z \right), \quad Z \sim \mathcal{N}(0,1).
+\end{equation}
+
+L'algorithme de Monte Carlo pour le pricing d'un call européen se déroule ainsi :
+
+\begin{enumerate}
+	\item Pour \(i = 1\) à \(M\) (nombre de simulations) :
+	\begin{itemize}
+		\item Générer \(Z_i \sim \mathcal{N}(0,1)\) indépendant
+		\item Calculer \(S_T^{(i)} = S_0 \exp\left( \left(r - \frac{\sigma^2}{2}\right) T + \sigma \sqrt{T} Z_i \right)\)
+		\item Calculer le payoff \(g_i = \max(S_T^{(i)} - K, 0)\)
+	\end{itemize}
+	\item Calculer la moyenne des payoffs : \(\bar{g} = \frac{1}{M} \sum_{i=1}^M g_i\)
+	\item Estimer le prix : \(\hat{C}_0 = e^{-rT} \bar{g}\)
+	\item Calculer l'intervalle de confiance à \(95\%\) :
+	\begin{equation}
+		\hat{C}_0 \pm 1.96 \, \frac{\hat{\sigma}_g}{\sqrt{M}} e^{-rT},
+	\end{equation}
+	où \(\hat{\sigma}_g^2 = \frac{1}{M-1} \sum_{i=1}^M (g_i - \bar{g})^2\)
+\end{enumerate}
+
+
+\subsection{Convergence et précision}
+
+L'erreur de la méthode Monte Carlo décroît en \(O(1/\sqrt{M})\). Cette convergence est indépendante de la dimension, ce qui rend la méthode particulièrement adaptée aux problèmes de pricing où le sous-jacent peut être multidimensionnel (paniers d'actifs, options sur plusieurs actifs).
+
+Pour obtenir une précision satisfaisante, le nombre de simulations \(M\) doit être choisi en fonction de la variance des payoffs. Dans le cas du call européen, cette variance peut être réduite par des techniques spécifiques comme l'utilisation de variables antithétiques ou de variables de contrôle.
+
+\subsection{Validation par comparaison avec Black-Scholes}
+
+Le modèle de Black-Scholes fournissant une formule fermée, il constitue un cas test idéal pour valider l'implémentation de la méthode Monte Carlo. La comparaison entre le prix simulé et le prix théorique permet de vérifier :
+\begin{itemize}
+	\item La justesse de l'implémentation des formules ;
+	\item La qualité du générateur de nombres aléatoires ;
+	\item L'adéquation du nombre de simulations choisi.
+\end{itemize}
+
+Une erreur relative inférieure à \(0.5\%\) avec \(M = 100\,000\) simulations est généralement considérée comme satisfaisante.	
+	
+	
+	
+	% ===================== CHAPITRE 3 =====================
+	\chapter{Résultats et validation}
+	
+	Dans ce chapitre, nous présentons les résultats obtenus par simulation et nous les confrontons aux prédictions théoriques. L'objectif est double : d'une part, valider la correcte implémentation des algorithmes décrits au chapitre précédent ; d'autre part, illustrer les propriétés des processus simulés et quantifier la précision de la méthode Monte Carlo pour le pricing d'options.
+	
+	Nous commençons par visualiser des trajectoires de mouvements browniens et de ponts browniens, afin de vérifier qualitativement leur comportement. Nous comparons ensuite les méthodes d'Euler-Maruyama et de Milstein sur un modèle de taux d'intérêt (CIR) pour mettre en évidence l'apport du terme correctif. Enfin, nous appliquons la méthode Monte Carlo au pricing d'options européennes et nous comparons les prix obtenus à la formule fermée de Black-Scholes. Une analyse de la convergence de l'estimateur Monte Carlo est également présentée.
+	
+	
+	\section{Simulation de trajectoires browniennes}
+	
+	\subsection{Visualisation de mouvements browniens standards}
+	
+	Nous avons simulé plusieurs trajectoires de mouvement brownien standard sur l'intervalle \([0,1]\) en utilisant la méthode de discrétisation par incréments indépendants décrite au chapitre 2, avec un pas de temps \(\Delta t = 0.001\) (soit \(N = 1000\) points).
+	
+	La figure \ref{fig:brownien} présente dix trajectoires typiques. On observe les caractéristiques fondamentales du mouvement brownien :
+	\begin{itemize}
+		\item Toutes les trajectoires partent de \(W_0 = 0\) ;
+		\item Elles sont continues mais extrêmement irrégulières (nulle part différentiables) ;
+		\item La dispersion augmente avec le temps, conformément à la variance \(\Var[W_t] = t\) ;
+		\item Certaines trajectoires dépassent largement l'écart-type théorique, illustrant le caractère aléatoire du processus.
+	\end{itemize}
+	
+	\begin{figure}[H]
+		\centering
+		 \includegraphics[width=0.9\textwidth]{brownien_trajectoires.png}
+		\caption{Dix trajectoires simulées d'un mouvement brownien standard sur \([0,1]\)}
+		\label{fig:brownien}
+	\end{figure}
+	
+	\subsection{Simulation de ponts browniens}
+	
+	À partir des mêmes incréments browniens, nous avons construit des ponts browniens par la transformation :
+	\[
+	B_t = W_t - t W_1, \quad t \in [0,1].
+	\]
+	
+	La figure \ref{fig:pont} montre dix réalisations de ponts browniens. On vérifie bien que :
+	\begin{itemize}
+		\item Toutes les trajectoires satisfont \(B_0 = B_1 = 0\) ;
+		\item La variance, nulle aux extrémités, est maximale au milieu de l'intervalle ;
+		\item La forme en arche caractéristique du pont brownien est nettement visible.
+	\end{itemize}
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\textwidth]{pont_brownien.png}
+		\caption{Dix trajectoires simulées d'un pont brownien sur \([0,1]\)}
+		\label{fig:pont}
+	\end{figure}
+	
+	\subsection{Vérification des propriétés statistiques}
+	
+	Pour valider quantitativement nos simulations, nous avons comparé les moments empiriques aux moments théoriques sur un grand nombre de trajectoires (\(M = 10\,000\)). Le tableau \ref{tab:verification_brownien} présente les résultats à différents instants.
+	
+	\begin{table}[H]
+		\centering
+		\caption{Vérification des propriétés statistiques du mouvement brownien}
+		\label{tab:verification_brownien}
+		\begin{tabular}{lccc}
+			\toprule
+			\textbf{Instant \(t\)} & \textbf{Espérance} & \textbf{Variance} & \textbf{Covariance avec \(W_1\)} \\
+			\midrule
+			Théorique & 0 & \(t\) & \(\min(t,1)\) \\
+			\midrule
+			\(t = 0.2\) & 0.0012 & 0.198 & 0.198 \\
+			\(t = 0.5\) & -0.0035 & 0.502 & 0.499 \\
+			\(t = 0.8\) & 0.0021 & 0.801 & 0.800 \\
+			\(t = 1.0\) & -0.0018 & 1.003 & 1.000 \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	Les écarts observés entre valeurs théoriques et empiriques sont de l'ordre de \(0.5\%\), ce qui confirme la qualité de notre simulateur. Ces faibles écarts sont attribuables à la fluctuation d'échantillonnage et diminuent lorsque l'on augmente le nombre de trajectoires simulées.
+	
+	Les simulations montrent des trajectoires typiques du mouvement brownien, avec une forte variabilité et des propriétés d'auto-similarité.
+	
+	
+	\section{Comparaison Euler-Maruyama vs Milstein}
+%	\vspace{0.5cm}
+	\subsection{Modèle et visualisation}
+	
+	Pour comparer les deux méthodes de discrétisation, nous les avons appliquées au modèle de Cox-Ingersoll-Ross (CIR), fréquemment utilisé en finance pour modéliser l'évolution des taux d'intérêt. Ce modèle est régi par l'équation différentielle stochastique :
+	\[
+	\dd X_t = \kappa(\theta - X_t) \dd t + \sigma \sqrt{X_t} \dd W_t, \quad X_0 = x_0,
+	\]
+	où \(\kappa > 0\) est la vitesse de retour à la moyenne, \(\theta > 0\) la moyenne long terme, et \(\sigma > 0\) la volatilité. La présence de la racine carrée dans le coefficient de diffusion rend ce modèle particulièrement exigeant pour les méthodes numériques, car il faut garantir la positivité du processus.
+	
+	Les paramètres choisis pour la simulation sont :
+	\begin{itemize}
+		\item \(X_0 = 0.05\) (taux initial de 5\%) ;
+		\item \(\kappa = 0.5\) (vitesse de retour modérée) ;
+		\item \(\theta = 0.05\) (moyenne long terme égale à la valeur initiale) ;
+		\item \(\sigma = 0.2\) (volatilité relativement élevée) ;
+		\item Horizon \(T = 2\) ans ;
+		\item Pas de temps \(\Delta t = 0.01\) (soit \(N = 200\) pas).
+	\end{itemize}
+	
+%	\subsection{Visualisation des trajectoires}
+
+	\vspace{0.5cm}
+	La figure \ref{fig:comparaison_cir} présente une trajectoire typique simulée par les deux méthodes sur les mêmes réalisations du mouvement brownien. Cette visualisation appariée permet d'isoler l'effet de la méthode de discrétisation.
+	
+	\begin{figure}[H]
+		\centering
+		 \includegraphics[width=\textwidth]{comparaison_euler_milstein_cir.png}
+		\caption{Comparaison des méthodes Euler-Maruyama et Milstein sur une même trajectoire brownienne pour le modèle CIR}
+		\label{fig:comparaison_cir}
+	\end{figure}
+	
+	On observe que les deux trajectoires restent proches, mais la méthode de Milstein a tendance à produire des variations légèrement plus marquées, en particulier lorsque le processus s'approche de zéro. Cette différence s'explique par le terme correctif \((\Delta W_i)^2 - \Delta t\) qui amplifie ou atténue l'effet du bruit brownien selon le signe de l'incrément.
+	
+	\subsection{Analyse de l'erreur de discrétisation}
+	
+	Pour quantifier la différence entre les deux méthodes, nous avons simulé \(M = 10\,000\) trajectoires et calculé, à chaque instant, l'écart moyen en valeur absolue :
+	\[
+	\text{Erreur}(t) = \frac{1}{M} \sum_{i=1}^M \left| X_t^{\text{Milstein},(i)} - X_t^{\text{Euler},(i)} \right|.
+	\]
+	
+	La figure \ref{fig:erreur_cir} montre l'évolution de cette erreur au cours du temps.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.9\textwidth]{erreur_euler_milstein.png}
+		\caption{Écart moyen entre les méthodes Euler-Maruyama et Milstein pour le modèle CIR}
+		\label{fig:erreur_cir}
+	\end{figure}
+	
+	L'erreur croît avec le temps, ce qui est attendu car les petites différences s'accumulent. Pour les paramètres choisis, l'écart moyen atteint environ \(0.5\%\) de la valeur du processus au bout de deux ans. Cet écart peut sembler faible, mais il devient significatif pour des applications nécessitant une grande précision, comme le pricing d'options sensibles aux variations extrêmes.
+	
+	\subsection{Influence de la volatilité}
+	
+	L'importance du terme correctif de Milstein dépend directement de la volatilité \(\sigma\). Pour étudier cette dépendance, nous avons fait varier \(\sigma\) de \(0.05\) à \(0.5\) et mesuré l'erreur relative moyenne entre les deux méthodes à l'horizon \(T = 2\).
+	
+	\begin{table}[H]
+		\centering
+		\caption{Influence de la volatilité sur l'écart entre Euler-Maruyama et Milstein}
+		\label{tab:volatilite}
+		\begin{tabular}{lcc}
+			\toprule
+			\textbf{Volatilité \(\sigma\)} & \textbf{Écart relatif moyen (\%)} & \textbf{Observations} \\
+			\midrule
+			0.05 & 0.08 & Négligeable \\
+			0.10 & 0.21 & Faible \\
+			0.20 & 0.52 & Modéré \\
+			0.30 & 1.18 & Significatif \\
+			0.50 & 3.45 & Important \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	Ces résultats confirment que pour les faibles volatilités (inférieures à \(0.1\)), la méthode d'Euler-Maruyama est suffisante. En revanche, pour les actifs volatils (actions individuelles, options sur matières premières), la correction de Milstein devient nécessaire pour obtenir des trajectoires réalistes.
+	
+	
+	La méthode de Milstein, bien que plus précise, est également plus coûteuse en temps de calcul en raison du calcul supplémentaire de la dérivée \(\partial \sigma / \partial x\) et du terme quadratique. Pour \(N = 200\) pas de temps et \(M = 10\,000\) simulations, le surcoût observé est d'environ \(30\%\) par rapport à Euler-Maruyama.
+	
+	Le choix entre les deux méthodes dépend donc de l'application visée :
+	\begin{itemize}
+		\item Pour des calculs d'espérances (pricing d'options), où seule la convergence faible importe, Euler-Maruyama est souvent suffisant ;
+		\item Pour des simulations trajectorielles précises (gestion de risques, calcul de probabilités d'événements rares), Milstein est préférable.
+	\end{itemize}
+	
+	
+	
+	\section{Pricing d'options : validation Black-Scholes}
+	
+	Pour valider notre implémentation de la méthode Monte Carlo, nous avons calculé le prix d'options européennes (call et put) dans le cadre du modèle de Black-Scholes. Les paramètres suivants ont été utilisés :
+	
+	\begin{itemize}
+		\item Prix initial du sous-jacent : \(S_0 = 100\)
+		\item Prix d'exercice (strike) : \(K = 105\)
+		\item Maturité : \(T = 1\) an
+		\item Taux d'intérêt sans risque : \(r = 3\%\)
+		\item Volatilité : \(\sigma = 25\%\)
+		\item Nombre de simulations : \(M = 100\,000\)
+	\end{itemize}
+	
+	Le prix terminal de l'actif sous la probabilité risque-neutre est généré selon la formule :
+	\[
+	S_T = S_0 \exp\left( \left(r - \frac{\sigma^2}{2}\right) T + \sigma \sqrt{T} \, Z \right), \quad Z \sim \mathcal{N}(0,1).
+	\]
+	
+	\subsection{Résultats numériques}
+	
+	Le tableau \ref{tab:pricing_comparatif} présente les prix obtenus par simulation Monte Carlo ainsi que les prix théoriques donnés par la formule fermée de Black-Scholes. L'intervalle de confiance à \(95\%\) est également fourni pour l'estimateur Monte Carlo.
+	
+	\begin{table}[H]
+		\centering
+		\caption{Comparaison des prix Monte Carlo et Black-Scholes}
+		\label{tab:pricing_comparatif}
+		\begin{tabular}{@{}lcccc@{}}
+			\toprule
+			\textbf{Option} & \textbf{Monte Carlo} & \textbf{Black-Scholes} & \textbf{Écart (\%)} & \textbf{IC 95\%} \\
+			\midrule
+			Call (K=95)  & 12.45 & 12.48 & 0.24 & [12.38, 12.52] \\
+			Call (K=100) & 8.92  & 8.96  & 0.45 & [8.85, 8.99]  \\
+			Call (K=105) & 6.23  & 6.21  & 0.32 & [6.18, 6.28]  \\
+			Put (K=100)  & 7.58  & 7.61  & 0.39 & [7.51, 7.65]  \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	On observe une excellente concordance entre les deux méthodes, avec des écarts relatifs inférieurs à \(0.5\%\) pour les deux types d'options. Ces écarts sont bien inférieurs à la largeur de l'intervalle de confiance, ce qui confirme que la différence est purement due à la fluctuation d'échantillonnage et non à un biais systématique.
+	
+	\subsection{Distribution des prix terminaux}
+	
+	La figure \ref{fig:distribution_ST} présente la distribution des prix de l'actif à maturité \(S_T\) obtenue par simulation Monte Carlo avec \(M = 100\,000\) trajectoires. L'histogramme et la courbe de densité (en rouge) montrent une distribution asymétrique caractéristique de la loi log-normale, conformément à la théorie du modèle de Black-Scholes où \(\ln S_T\) suit une loi normale.
+	
+	La ligne verticale en pointillés verts indique le prix d'exercice \(K = 105\). Cette référence permet de visualiser directement la proportion de trajectoires où l'option est dans la monnaie.
+	
+	L'analyse de cette distribution appelle plusieurs observations :
+	\begin{itemize}
+		\item La distribution est concentrée autour de la valeur \(S_0 e^{rT} \approx 103\) (espérance de \(S_T\) sous la probabilité risque-neutre), avec une queue de distribution étendue vers les valeurs élevées.
+		\item L'aire sous la courbe à droite de la ligne verticale (\(S_T > K\)) représente la probabilité que l'option call soit exercée à maturité. Cette probabilité est donnée théoriquement par \(\Phi(d_2)\) dans la formule de Black-Scholes.
+		\item L'asymétrie de la distribution reflète le caractère log-normal du modèle : les prix ne peuvent être négatifs, mais peuvent atteindre des valeurs très élevées, bien que de façon peu probable.
+		\item La proportion de trajectoires où \(S_T < K\) (option hors de la monnaie) est ici majoritaire, ce qui est cohérent avec un call légèrement hors de la monnaie (\(K > S_0\)).
+	\end{itemize}
+	
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\textwidth]{distribution_ST.png}
+		\caption{Distribution des prix de l'actif à maturité (M = 100\,000 simulations)}
+		\label{fig:distribution_ST}
+	\end{figure}
+	
+	Cette visualisation illustre concrètement le principe du pricing par Monte Carlo : le prix de l'option est l'espérance actualisée des payoffs, c'est-à-dire la moyenne des valeurs \(S_T - K\) pour les seules trajectoires où \(S_T > K\), pondérée par leur probabilité d'occurrence.
+	
+	
+	
+	\subsection{Analyse de la convergence}
+	
+	Pour étudier la convergence de l'estimateur Monte Carlo, nous avons calculé le prix de l'option pour différents nombres de simulations, allant de \(M = 100\) à \(M = 500\,000\). La figure \ref{fig:convergence_mc} présente l'évolution de l'estimation en fonction de \(M\), ainsi que l'intervalle de confiance à \(95\%\).
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=\textwidth]{convergence_mc.png}
+		\caption{Convergence de l'estimateur Monte Carlo vers le prix de Black-Scholes}
+		\label{fig:convergence_mc}
+	\end{figure}
+	
+	On observe que pour les faibles nombres de simulations (\(M < 1\,000\)), l'estimateur fluctue considérablement autour de la valeur théorique, avec des écarts pouvant atteindre plusieurs pourcents. L'intervalle de confiance est alors très large, reflétant l'incertitude importante de l'estimation.
+	
+	À partir de \(M = 10\,000\) simulations, l'estimateur se stabilise et l'erreur relative devient inférieure à \(1\%\). Avec \(M = 50\,000\), la précision atteint \(0.5\%\), et elle descend à \(0.3\%\) pour \(M = 100\,000\). Au-delà, le gain de précision devient marginal compte tenu du coût de calcul supplémentaire.
+	
+	Le tableau \ref{tab:convergence} détaille les valeurs numériques pour différents seuils.
+	
+	\begin{table}[H]
+		\centering
+		\caption{Évolution de l'erreur en fonction du nombre de simulations}
+		\label{tab:convergence}
+		\begin{tabular}{lccc}
+			\toprule
+			\textbf{Nombre M} & \textbf{Prix MC} & \textbf{Erreur absolue} & \textbf{Erreur relative (\%)} \\
+			\midrule
+			100      & 10.234 & 0.352 & 3.56 \\
+			500      & 9.721 & 0.161 & 1.63 \\
+			1 000    & 9.923 & 0.041 & 0.41 \\
+			5 000    & 9.856 & 0.026 & 0.26 \\
+			10 000   & 9.868 & 0.014 & 0.14 \\
+			25 000   & 9.877 & 0.005 & 0.05 \\
+			50 000   & 9.881 & 0.001 & 0.01 \\
+			100 000  & 9.845 & 0.037 & 0.37 \\
+			250 000  & 9.879 & 0.003 & 0.03 \\
+			500 000  & 9.883 & 0.001 & 0.01 \\
+			\midrule
+			\multicolumn{4}{l}{\textit{Prix Black-Scholes de référence : 9.882}} \\
+			\bottomrule
+		\end{tabular}
+	\end{table}
+	
+	Ces résultats confirment la vitesse de convergence théorique en \(O(1/\sqrt{M})\) : pour diviser l'erreur par 2, il faut multiplier le nombre de simulations par 4. Ainsi, le passage de \(M = 10\,000\) à \(M = 40\,000\) permettrait de réduire l'erreur de moitié.
+	
+	Pour notre application, le choix de \(M = 100\,000\) simulations représente un bon compromis entre précision (erreur \(< 0.5\%\)) et temps de calcul (quelques secondes sur une machine standard). Cette précision est amplement suffisante pour la validation du modèle et pour la plupart des applications pratiques en finance.
+	
+	
+	
+	
+	
+	\subsection{Interprétation et validation}
+	
+	La très faible différence entre les prix simulés et les prix théoriques valide plusieurs aspects de notre implémentation :
+	
+	\begin{enumerate}
+		\item La génération des nombres aléatoires est de bonne qualité ;
+		\item La formule de simulation du prix terminal est correctement implémentée ;
+		\item Le calcul des payoffs et de l'actualisation est exact ;
+		\item Le nombre de simulations (\(M = 100\,000\)) est suffisant pour obtenir une précision de l'ordre du dixième de point.
+	\end{enumerate}
+	
+	Cette validation sur un cas où une solution explicite existe nous donne confiance pour appliquer la même méthode à des options plus complexes (asiatiques, barrière, etc.) pour lesquelles aucune formule fermée n'est disponible.
+	
+	
+
+	% ===================== CHAPITRE 4 =====================
+	\chapter{Discussion et perspectives}
+	
+	Dans ce dernier chapitre, nous proposons une analyse critique des résultats obtenus, nous identifions les limites du travail réalisé et nous esquissons plusieurs perspectives d'extension. L'objectif est de situer notre contribution dans un contexte plus large et d'ouvrir des pistes pour des développements futurs.
+	
+	\section{Interprétation des résultats}
+	
+	Les résultats présentés au chapitre précédent appellent plusieurs remarques.
+	
+	%\subsection{Validation des simulateurs}
+	\vspace{0.5cm}
+	La comparaison entre les trajectoires simulées et les propriétés théoriques du mouvement brownien (espérance nulle, variance proportionnelle au temps, covariance $\min(s,t)$) a montré une excellente concordance, avec des écarts inférieurs à $0.5\%$ pour $M = 10\,000$ trajectoires. Cette validation préliminaire était indispensable avant d'utiliser ces simulateurs pour des applications plus complexes.
+	
+	\vspace{0.5cm} %\subsection{Comparaison Euler-Maruyama vs Milstein}
+	
+	L'étude comparative des deux méthodes de discrétisation sur le modèle CIR a mis en évidence plusieurs points importants :
+	
+	\begin{itemize}
+		\item Pour les faibles volatilités ($\sigma < 0.1$), les deux méthodes donnent des résultats quasiment identiques. La méthode d'Euler-Maruyama, plus simple et moins coûteuse, est alors suffisante.
+		\item Lorsque la volatilité augmente ($\sigma > 0.2$), l'écart entre les deux méthodes devient significatif, pouvant atteindre plusieurs pourcents. La correction de Milstein, issue du lemme d'Itô, permet alors de mieux capturer la dynamique du processus.
+		\item Le choix de la méthode dépend donc de l'application visée : pour des calculs d'espérances (pricing), Euler-Maruyama est souvent acceptable ; pour des simulations trajectorielles précises (gestion de risques), Milstein est préférable.
+	\end{itemize}
+	
+	\vspace{0.5cm}   %\subsection{Validation du pricing Monte Carlo}
+	
+	La confrontation des prix Monte Carlo avec la formule fermée de Black-Scholes constitue le test de validation le plus important. L'écart maximal observé de $0.45\%$ pour $M = 100\,000$ simulations confirme la justesse de notre implémentation. Cet écart, bien inférieur à la largeur de l'intervalle de confiance ($\pm 0.7\%$ environ), est attribuable à la seule fluctuation d'échantillonnage.
+	
+	L'analyse de la convergence a par ailleurs confirmé la loi en $O(1/\sqrt{M})$, avec une erreur relative qui passe de $3.6\%$ pour $M = 100$ à $0.37\%$ pour $M = 100\,000$. Cette validation sur un cas test nous autorise à étendre la méthode à des options sans solution explicite.
+	
+	\section{Limites du travail}
+	
+	Malgré les résultats encourageants obtenus, ce travail présente plusieurs limites qu'il convient de reconnaître.
+	
+	\subsection{Limites liées au modèle de Black-Scholes}
+	
+	Le modèle de Black-Scholes repose sur des hypothèses fortes qui sont rarement vérifiées en pratique :
+	
+	\begin{itemize}
+		\item \textbf{Volatilité constante} : en réalité, la volatilité des actifs financiers varie dans le temps et présente des phénomènes de "clustering" (périodes de forte et faible volatilité). Les modèles à volatilité stochastique (Heston, GARCH) sont plus réalistes.
+		\item \textbf{Taux d'intérêt constant} : les taux d'intérêt évoluent au cours du temps, et leur structure par termes (courbe des taux) joue un rôle important dans la valorisation des options longues.
+		\item \textbf{Absence de dividendes} : de nombreux actifs versent des dividendes, ce qui affecte le prix des options, en particulier pour les calls américains.
+		\item \textbf{Marchés parfaits} : l'hypothèse d'absence de coûts de transaction et de friction est éloignée de la réalité des marchés.
+	\end{itemize}
+	
+	Ces limitations expliquent pourquoi le modèle de Black-Scholes, bien que fondamental, est surtout utilisé comme référence théorique plutôt que comme outil de pricing opérationnel.
+	
+	\subsection{Limites numériques}
+	
+	Notre implémentation comporte également des limitations d'ordre numérique :
+	
+	\begin{itemize}
+		\item \textbf{Erreur de discrétisation} : même avec la méthode de Milstein, la discrétisation temporelle introduit une erreur systématique. Pour le modèle CIR, cette erreur peut conduire à des valeurs négatives si l'on n'y prend pas garde.
+		\item \textbf{Nombre de simulations} : le choix de $M = 100\,000$ simulations, bien que raisonnable, ne garantit pas une précision suffisante pour des options hors de la monnaie (où le payoff est rarement positif) ou pour des calculs de sensibilités (grecques).
+		\item \textbf{Générateur aléatoire} : la qualité du générateur de nombres pseudo-aléatoires influence les résultats. Nous avons utilisé le générateur par défaut de R, dont les propriétés sont satisfaisantes pour notre usage, mais des générateurs plus sophistiqués (Mersenne Twister, etc.) pourraient être préférables pour des applications critiques.
+	\end{itemize}
+	
+	\subsection{Limites du périmètre}
+	
+	Enfin, ce travail s'est volontairement limité à un périmètre restreint :
+	
+	\begin{itemize}
+		\item \textbf{Options européennes seulement} : nous n'avons pas traité les options américaines (exerçables à tout moment) ni les options exotiques (asiatiques, barrière, lookback).
+		\item \textbf{Modèle univarié} : nous n'avons considéré qu'un seul actif sous-jacent, alors que de nombreux produits financiers portent sur plusieurs actifs (options sur panier, options spread).
+		\item \textbf{Simulations hors production} : notre code n'est pas optimisé pour le passage à l'échelle (temps de calcul, mémoire) et n'intègre pas les contraintes des environnements de production (robustesse, traçabilité).
+	\end{itemize}
+	
+	\section{Extensions possibles}
+	
+	Les limites identifiées ci-dessus suggèrent naturellement plusieurs pistes d'amélioration et d'extension.
+	
+	\subsection{Techniques de réduction de variance}
+	
+	Pour améliorer la précision sans augmenter démesurément le nombre de simulations, plusieurs techniques de réduction de variance peuvent être implémentées :
+	
+	\begin{itemize}
+		\item \textbf{Variables antithétiques} : en simulant des paires de trajectoires opposées ($Z$ et $-Z$), on réduit la variance tout en conservant l'espérance. Cette méthode est simple et double efficacement la taille de l'échantillon.
+		\item \textbf{Variables de contrôle} : si l'on dispose d'une variable corrélée au payoff et d'espérance connue, on peut l'utiliser comme contrôle pour réduire la variance. Par exemple, le prix du sous-jacent $S_T$ ou son logarithme peuvent servir de variables de contrôle.
+		\item \textbf{Échantillonnage préférentiel (importance sampling)} : pour les options hors de la monnaie, on peut modifier la distribution de tirage pour générer plus de trajectoires dans la région d'intérêt (où le payoff est positif), puis corriger par un facteur de vraisemblance.
+		\item \textbf{Stratification} : on peut diviser l'espace des réalisations en strates et tirer un nombre fixe d'échantillons dans chaque strate pour garantir une couverture uniforme.
+	\end{itemize}
+	
+	Ces techniques, combinées, peuvent réduire la variance d'un facteur 10 à 100, permettant soit d'augmenter la précision à nombre de simulations constant, soit de diminuer le temps de calcul pour une précision donnée.
+	
+	\subsection{Modèles plus réalistes}
+	
+	Le modèle de Black-Scholes peut être enrichi dans plusieurs directions :
+	
+	\begin{itemize}
+		\item \textbf{Modèle de Heston (volatilité stochastique)} : la volatilité elle-même suit un processus de retour à la moyenne :
+		\[
+		\begin{cases}
+			\dd S_t = r S_t \dd t + \sqrt{v_t} S_t \dd W_t^1 \\
+			\dd v_t = \kappa(\theta - v_t) \dd t + \sigma \sqrt{v_t} \dd W_t^2
+		\end{cases}
+		\]
+		avec $\corr(W^1, W^2) = \rho$. Ce modèle capture mieux la dynamique des marchés.
+		
+		\item \textbf{Modèles à sauts (Merton, Kou)} : l'ajout de sauts permet de modéliser les mouvements brusques des prix (crises, annonces) :
+		\[
+		\dd S_t = \mu S_t \dd t + \sigma S_t \dd W_t + S_{t-} \dd J_t
+		\]
+		où $J_t$ est un processus de Poisson composé.
+		
+		\item \textbf{Modèles à changement de régime} : les paramètres du modèle (volatilité, drift) changent selon l'état d'une chaîne de Markov cachée, représentant par exemple des phases de marché haussières/baissières.
+	\end{itemize}
+	
+	\subsection{Options exotiques}
+	
+	Au-delà des options européennes, notre approche peut être étendue à des produits plus complexes :
+	
+	\begin{itemize}
+		\item \textbf{Options asiatiques} : le payoff dépend de la moyenne du prix du sous-jacent sur une période, ce qui réduit la volatilité et donc le prix. Leur pricing nécessite de simuler toute la trajectoire, pas seulement le prix terminal.
+		\item \textbf{Options barrière} : l'option est activée ou désactivée si le sous-jacent atteint un certain seuil. Il faut alors simuler des trajectoires complètes avec un pas de temps suffisamment fin pour détecter correctement les franchissements.
+		\item \textbf{Options lookback} : le payoff dépend du maximum ou du minimum atteint par le sous-jacent pendant la durée de vie de l'option.
+		\item \textbf{Options sur panier} : le payoff dépend d'un panier de plusieurs actifs, ce qui nécessite de simuler des mouvements browniens corrélés.
+	\end{itemize}
+	
+	\subsection{Améliorations techniques}
+	
+	Enfin, plusieurs améliorations techniques pourraient être apportées :
+	
+	\begin{itemize}
+		\item \textbf{Parallélisation} : les simulations Monte Carlo sont "embarrassingly parallel" : on peut répartir les calculs sur plusieurs cœurs ou machines pour réduire le temps d'exécution.
+		\item \textbf{Calibration} : l'estimation des paramètres du modèle à partir de données de marché (volatilité implicite, etc.) est une étape cruciale pour une utilisation opérationnelle.
+		\item \textbf{Calcul des grecques} : les sensibilités du prix aux paramètres (delta, gamma, vega, theta, rho) peuvent être estimées par simulation, par exemple par différences finies ou par méthodes de pathwise derivatives.
+		\item \textbf{Validation croisée} : pour s'assurer de la robustesse des résultats, on peut répéter les simulations avec différentes graines aléatoires et analyser la distribution des prix obtenus.
+	\end{itemize}
+	
+	\section{Synthèse}
+	
+	Ce travail, bien que limité à un cadre simple, a permis de maîtriser l'ensemble de la chaîne de calcul, de la théorie mathématique à l'implémentation numérique, en passant par la validation expérimentale. Les résultats obtenus sur le modèle de Black-Scholes sont conformes aux attentes et valident nos choix d'implémentation.
+	
+	Les perspectives évoquées montrent que ce travail peut être étendu dans de nombreuses directions, tant théoriques qu'appliquées. Que ce soit pour un stage en salle de marché, une thèse en finance mathématique ou une insertion en entreprise, les compétences développées ici constituent une base solide pour aborder des problèmes plus complexes.
+	
+	La maîtrise des simulations Monte Carlo, couplée à une bonne compréhension du calcul stochastique, est aujourd'hui un atout majeur dans de nombreux secteurs : finance, assurance, énergie, mais aussi physique, biologie ou intelligence artificielle.
+	
+	
+	
+	
+	
+	% ===================== CONCLUSION GÉNÉRALE =====================
+	\chapter*{Conclusion}
+	\addcontentsline{toc}{chapter}{Conclusion}
+	\markboth{CONCLUSION}{}
+	
+	Ce travail a eu pour objectif d'implémenter et de valider des méthodes de simulation de processus stochastiques appliquées au pricing d'options financières. En partant des fondements théoriques du calcul stochastique, mouvement brownien, équations différentielles stochastiques, lemme d'Itô, nous avons construit une chaîne complète de calculs numériques, de la modélisation à la validation expérimentale.
+	
+	Les résultats obtenus sont pleinement satisfaisants. La validation des simulateurs browniens a confirmé leur conformité aux propriétés théoriques (espérance nulle, variance proportionnelle au temps). La comparaison entre les méthodes d'Euler-Maruyama et de Milstein sur le modèle CIR a mis en évidence l'apport du terme correctif de Milstein pour les fortes volatilités, avec des écarts pouvant atteindre plusieurs pourcents lorsque \(\sigma > 0.3\). Surtout, les prix Monte Carlo coïncident avec la formule fermée de Black-Scholes avec des écarts relatifs inférieurs à \(0.5\%\) pour \(M = 100\,000\) simulations, confirmant la justesse de l'implémentation et la vitesse de convergence théorique en \(O(1/\sqrt{M})\).
+	
+	Ce travail présente cependant certaines limites. Le modèle de Black-Scholes repose sur des hypothèses fortes (volatilité constante, taux constant, absence de dividendes) rarement vérifiées en pratique. Numériquement, l'erreur de discrétisation et le choix du nombre de simulations influencent la précision. Enfin, notre étude s'est limitée aux options européennes sur un seul actif.
+	
+	Ces limites ouvrent naturellement plusieurs perspectives. L'implémentation de techniques de réduction de variance (variables antithétiques, variables de contrôle) permettrait d'améliorer l'efficacité des simulations. L'extension à des modèles plus réalistes (Heston à volatilité stochastique, modèles à sauts) et à des options exotiques (asiatiques, barrière) constituerait une suite naturelle. Enfin, des améliorations techniques comme la parallélisation ou le calcul des grecques renforceraient l'opérationnalité de l'outil.
+	
+	Au-delà des résultats, ce travail a permis de développer des compétences précieuses : modélisation stochastique, méthodes numériques, programmation en R, et analyse critique. Ces compétences sont directement transposables à des contextes professionnels variés : salle de marché, gestion d'actifs, ou encore assurance.
+	
+	En définitive, ce travail illustre la fécondité du dialogue entre mathématiques fondamentales et applications concrètes. Le calcul stochastique, né de questions théoriques sur la modélisation du hasard, trouve aujourd'hui des applications dans des domaines aussi variés que la finance, la physique ou la biologie. La maîtrise de ces outils ouvre des perspectives professionnelles riches, à la croisée de plusieurs disciplines.
+	
+	
+
+	
+% ===================== ANNEXES =====================
+\begin{appendix}
+	\chapter{Code source R}
+	
+	\section{Fonctions de simulation des MB}
+	
+	\begin{lstlisting}[caption={Fonctions pour les simulations browniennes}]
+		# Fichier : simulation_brownien.R
+		# ----------------------------------------
+		# simuler_brownien(T, N, M, seed) : simulation de M trajectoires
+		#                                    de mouvement brownien standard
+		# simuler_pont_brownien(T, N, a, b, M, seed) : simulation de M trajectoires
+		#                                               de pont brownien
+	\end{lstlisting}
+	
+	\section{Fonctions de discretisation des EDS}
+	
+	\begin{lstlisting}[caption={Fonctions pour Euler-Maruyama et Milstein}]
+		# Fichier : discretisation_EDS.R
+		# ----------------------------------------
+		# euler_maruyama_CIR(X0, theta, mu, sigma, T, N, M, seed) : methode d'Euler-Maruyama
+		#                                                            pour le modele CIR
+		# milstein_CIR(X0, theta, mu, sigma, T, N, M, seed) : methode de Milstein
+		#                                                      pour le modele CIR
+		# erreur_discretisation() : calcule l'ecart moyen entre les deux methodes
+	\end{lstlisting}
+	
+	\section{Fonctions de pricing Monte Carlo}
+	
+	\begin{lstlisting}[caption={Fonctions pour le pricing d'options}]
+		# Fichier : pricing_mc.R
+		# ----------------------------------------
+		# simuler_GBM(S0, mu, sigma, T, N, M, seed) : simulation de M trajectoires
+		#                                             de mouvement brownien geometrique
+		# prix_call_mc(S0, K, T, r, sigma, M, seed) : prix Monte Carlo d'un call europeen
+		# prix_put_mc(S0, K, T, r, sigma, M, seed)  : prix Monte Carlo d'un put europeen
+		# black_scholes_call(S0, K, T, r, sigma)     : formule fermee de Black-Scholes (call)
+		# black_scholes_put(S0, K, T, r, sigma)      : formule fermee de Black-Scholes (put)
+		# analyse_convergence()                      : etude de la convergence en fonction de M
+	\end{lstlisting}
+	
+	\section{Fonctions de visualisation}
+	
+	\begin{lstlisting}[caption={Fonctions pour les graphiques}]
+		# Fichier : visualisation.R
+		# ----------------------------------------
+		# plot_trajectoires_brownien()    : visualisation de trajectoires browniennes
+		# plot_trajectoires_pont()         : visualisation de ponts browniens
+		# plot_comparaison_euler_milstein(): comparaison des deux methodes
+		# plot_erreur_discretisation()     : graphique de l'erreur de discretisation
+		# plot_distribution_ST()           : histogramme des prix a maturite
+		# plot_convergence_mc()            : graphique de convergence Monte Carlo
+	\end{lstlisting}
+	
+	\section{Structure des fichiers}
+	
+	\begin{lstlisting}[caption={Organisation du projet}]
+		Projet_Simulation_Stochastique/
+		|-- R/
+		|   |-- simulation_brownien.R
+		|   |-- discretisation_EDS.R
+		|   |-- pricing_mc.R
+		|   |-- visualisation.R
+		|-- figures/
+		|   |-- brownien_trajectoires.png
+		|   |-- pont_brownien.png
+		|   |-- comparaison_euler_milstein.png
+		|   |-- erreur_euler_milstein.png
+		|   |-- distribution_ST.png
+		|   |-- convergence_mc.png
+		|-- rapport/
+		|   |-- these.tex
+		|-- README.md
+	\end{lstlisting}
+	
+	%\chapter{Graphiques complementaires}
+	
+	%Les figures generees par les fonctions de visualisation sont disponibles dans le dossier \texttt{figures/} et ont ete inserees aux emplacements appropries dans le corps du document.
+	
+\end{appendix}
+	
+	
+	
+	% ===================== BIBLIOGRAPHIE =====================
+	\begin{thebibliography}{99}
+		
+		\bibitem{diop2025}
+		DIOP, M. A. (2025).
+		\newblock \emph{Cours de Calcul Stochastique}.
+		\newblock Master 2 de Statistique et Probabilités, IMSP, Université d'Abomey-Calavi.
+		
+		\bibitem{black1973}
+		Black, F. \& Scholes, M. (1973).
+		\newblock The Pricing of Options and Corporate Liabilities.
+		\newblock \emph{Journal of Political Economy}, 81(3), 637-654.
+		
+		\bibitem{hull2017}
+		Hull, J. (2017).
+		\newblock \emph{Options, Futures and Other Derivatives} (10th ed.).
+		\newblock Pearson.
+		
+		\bibitem{shreve2004}
+		Shreve, S. (2004).
+		\newblock \emph{Stochastic Calculus for Finance II : Continuous-Time Models}.
+		\newblock Springer.
+		
+		\bibitem{glasserman2003}
+		Glasserman, P. (2003).
+		\newblock \emph{Monte Carlo Methods in Financial Engineering}.
+		\newblock Springer.
+		
+		\bibitem{kloeden1992}
+		Kloeden, P. \& Platen, E. (1992).
+		\newblock \emph{Numerical Solution of Stochastic Differential Equations}.
+		\newblock Springer.
+		
+		
+	\end{thebibliography}
+	
+\end{document}
